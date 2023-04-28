@@ -1,31 +1,41 @@
+/** @format */
 
-import Head from 'next/head';
-import Image from 'next/image';
-import { useEffect } from 'react';
-import GradientBG from '../components/GradientBG.js';
-import styles from '../styles/Home.module.css';
+import Head from "next/head";
+import Image from "next/image";
+import { useEffect, useState } from "react";
+import GradientBG from "../components/GradientBG.js";
+import styles from "../styles/Home.module.css";
+import TokenForm from "../components/TokenForm";
+import { Button, useToast } from "@chakra-ui/react";
 
 export default function Home() {
-  useEffect(() => {
-    (async () => {
-      const { Mina, isReady, PublicKey } = await import('snarkyjs');
-      const { Add } = await import('../../../contracts/build/src/');
+  const [connectContent, setConnectContent] = useState("Connect wallet");
+  const [account, setAccount] = useState();
 
-      await isReady;
+  const toast = useToast({
+    position: "bottom-right",
+  });
 
-      // Update this to use the address (public key) for your zkApp account.
-      // To try it out, you can try this address for an example "Add" smart contract that we've deployed to
-      // Berkeley Testnet B62qkwohsqTBPsvhYE8cPZSpzJMgoKn4i1LQRuBAtVXWpaT4dgH6WoA.
-      const zkAppAddress = '';
-      // This should be removed once the zkAppAddress is updated.
-      if (!zkAppAddress) {
-        console.error(
-          'The following error is caused because the zkAppAddress has an empty string as the public key. Update the zkAppAddress with the public key for your zkApp account, or try this address for an example "Add" smart contract that we deployed to Berkeley Testnet: B62qkwohsqTBPsvhYE8cPZSpzJMgoKn4i1LQRuBAtVXWpaT4dgH6WoA'
-        );
+  const connectWallet = async () => {
+    if (!(window as any).mina) {
+      toast({
+        title: "No provider was found Auro Wallet",
+        status: "error",
+      });
+    }
+
+    try {
+      const windowMina = (window as any).mina;
+      const data = await windowMina.requestAccounts();
+      if (data.length) {
+        setConnectContent(`${data[0].slice(0, 6)}...${data[0].slice(-4)}`);
+      } else {
+        setAccount(data[0]);
       }
-      //const zkApp = new Add(PublicKey.fromBase58(zkAppAddress))
-    })();
-  }, []);
+    } catch (error: any) {
+      throw new Error(error.message);
+    }
+  };
 
   return (
     <>
@@ -36,6 +46,17 @@ export default function Home() {
       </Head>
       <GradientBG>
         <main className={styles.main}>
+          <Button
+            onClick={connectWallet}
+            position={"absolute"}
+            borderRadius={0}
+            top={2}
+            right={2}
+            bg={"orange"}
+          >
+            {connectContent}
+          </Button>
+
           <div className={styles.center}>
             <a
               href="https://minaprotocol.com/"
@@ -51,97 +72,8 @@ export default function Home() {
                 priority
               />
             </a>
-            <p className={styles.tagline}>
-              built with
-              <code className={styles.code}> SnarkyJS</code>
-            </p>
           </div>
-          <p className={styles.start}>
-            Get started by editing
-            <code className={styles.code}> src/pages/index.tsx</code>
-          </p>
-          <div className={styles.grid}>
-            <a
-              href="https://docs.minaprotocol.com/zkapps"
-              className={styles.card}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <h2>
-                <span>DOCS</span>
-                <div>
-                  <Image
-                    src="/assets/arrow-right-small.svg"
-                    alt="Mina Logo"
-                    width={16}
-                    height={16}
-                    priority
-                  />
-                </div>
-              </h2>
-              <p>Explore zkApps, how to build one, and in-depth references</p>
-            </a>
-            <a
-              href="https://docs.minaprotocol.com/zkapps/tutorials/hello-world"
-              className={styles.card}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <h2>
-                <span>TUTORIALS</span>
-                <div>
-                  <Image
-                    src="/assets/arrow-right-small.svg"
-                    alt="Mina Logo"
-                    width={16}
-                    height={16}
-                    priority
-                  />
-                </div>
-              </h2>
-              <p>Learn with step-by-step SnarkyJS tutorials</p>
-            </a>
-            <a
-              href="https://discord.gg/minaprotocol"
-              className={styles.card}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <h2>
-                <span>QUESTIONS</span>
-                <div>
-                  <Image
-                    src="/assets/arrow-right-small.svg"
-                    alt="Mina Logo"
-                    width={16}
-                    height={16}
-                    priority
-                  />
-                </div>
-              </h2>
-              <p>Ask questions on our Discord server</p>
-            </a>
-            <a
-              href="https://docs.minaprotocol.com/zkapps/how-to-deploy-a-zkapp"
-              className={styles.card}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <h2>
-                <span>DEPLOY</span>
-                <div>
-                  <Image
-                    src="/assets/arrow-right-small.svg"
-                    alt="Mina Logo"
-                    width={16}
-                    height={16}
-                    priority
-                  />
-                </div>
-              </h2>
-              <p>Deploy a zkApp to Berkeley Testnet</p>
-            </a>
-          </div>
+          <TokenForm />
         </main>
       </GradientBG>
     </>
