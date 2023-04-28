@@ -76,32 +76,28 @@ function TokenForm() {
                 return;
               }
 
-              const { Mina, isReady, PublicKey } = await import("snarkyjs");
-              const { Add } = await import("../../../contracts/build/src/");
+              // const { Mina, isReady, PublicKey } = await import("snarkyjs");
+              // const { TokenContract } = await import("../../../contracts/build/src/");
 
-							const accounts = await minaWallet.getAccounts()
-              const tx = await Mina.transaction(() => {
-                const AddSmartContract = new Add(
-                  accounts[0]
-                );
-                AddSmartContract.deploy();
-              });
+							// const accounts = await minaWallet.getAccounts()
+              // const tx = await Mina.transaction(() => {
+              //   const TokenSmartContract = new TokenContract(
+              //     accounts[0]
+              //   );
+              //   TokenSmartContract.init(values.symbol);
+              // });
 
-              await tx.prove();
+              // await tx.prove();
 
-              const { hash } = await minaWallet.sendTransaction({
-                transaction: tx.toJSON(),
-                feePayer: {
-                  fee: "",
-                  memo: "zk",
-                },
-              });
+              // const { hash } = await minaWallet.sendTransaction({
+              //   transaction: tx.toJSON(),
+              //   feePayer: {
+              //     fee: "",
+              //     memo: "zk",
+              //   },
+              // });
 
-              console.log(hash);
-              // setTimeout(() => {
-              //   alert(JSON.stringify(values, null, 2));
-              //   actions.setSubmitting(false);
-              // }, 1000);
+              // console.log(hash);
               actions.setSubmitting(false);
             } catch (error: any) {
               toast({
